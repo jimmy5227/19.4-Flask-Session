@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %} Block title {% endblock %}
+<!-- {% block page_name %} You are on greeter form {% endblock %} -->
+
+{% block content %}
+    <title>Survey Start</title>
+    <h1>{{title}}</h1>
+    <p>{{instructions}}</p>
+    <form action="/questions/0">
+    <button id="survey">Start the Survey!</button>
+{% endblock %}
