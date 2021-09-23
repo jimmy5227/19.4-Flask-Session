@@ -1,5 +1,5 @@
-from flask import Flask, request, render_template, redirect, flash
-from flask_debugtoolbar import DebugToolbarExtension
+from flask import Flask, request, render_template, redirect, flash, session
+# from flask_debugtoolbar import DebugToolbarExtension
 import surveys
 
 app = Flask(__name__)
@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'HelloWorld'
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-debug = DebugToolbarExtension(app)
+# debug = DebugToolbarExtension(app)
 
 RESPONSES = []
 questionsArray = surveys.satisfaction_survey.questions
@@ -27,7 +27,7 @@ def questions(questionnum=0):
     if questionnum not in range(len(questionsArray)) and len(RESPONSES) < len(questionsArray):
         flash('That is not a valid survey question')
         return redirect(f'/questions/{len(RESPONSES)}')
-    elif len(RESPONSES) not in range(len(questionsArray)):
+    if len(RESPONSES) not in range(len(questionsArray)):
         return redirect('/thanks')
     else:
         question = surveys.satisfaction_survey.questions[len(
@@ -39,9 +39,18 @@ def questions(questionnum=0):
 def answer():
     choice = request.form.get('answer')
     RESPONSES.append(choice)
+    session['responses'] = RESPONSES
     return redirect(f'/questions/{len(RESPONSES)}')
 
 
 @app.route('/thanks')
 def thanks():
-    return 'Thank you!'
+    return f"""<h1>Thank you!</h1>
+    <h2>{session['responses']}</h2>
+    """
+
+
+@app.route('/session', methods=['POST'])
+def survery_start():
+    session['responses'] = []
+    return redirect(f'/questions/0')
